@@ -1,5 +1,5 @@
 /*
- * @name          navInPageScroll
+ * @name          inPageScrollingNav
  * @version       1.0
  * @lastmodified  2016-11-22
  * @author        Saeid Mohadjer
@@ -10,7 +10,7 @@
 ;(function($) {
 	'use strict';
 
-	var pluginName = 'navInPageScroll',
+	var pluginName = 'inPageScrollingNav',
 	defaults = {};
 
 	// The actual plugin constructor
