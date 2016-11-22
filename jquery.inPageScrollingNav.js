@@ -54,6 +54,28 @@
 			var pluginInstance = this;
 			var pageIsScrollingByScript = false;
 
+			//close button
+			(function() {
+				var $nav = pluginInstance.$element;
+				var $btn = $nav.find('button');
+
+				if ($btn.length === 0) {
+					return;
+				}
+
+				var text = $btn.text();
+				var altText = $btn.data('alt-text');
+
+				$btn.on('click', function() {
+					$nav.toggleClass('closed');
+
+					if ($btn.text() === text) {
+						$btn.text(altText);
+					} else {
+						$btn.text(text);
+					}
+				});
+			})();
 
 			$navItems.on('click', function(e) {
 

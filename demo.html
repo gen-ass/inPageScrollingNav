@@ -9,6 +9,8 @@
 			/* all styles are optional */
 			body {
 				font-size: 2em;
+				max-width: 1024px;
+				margin: auto;
 			}
 			header, footer {
 				padding: 100px 20px;
@@ -20,6 +22,9 @@
 				right: 0;
 				top: 100px;
 				padding: 0 10px 0 20px;
+			}
+			nav.closed ul {
+				display: none;
 			}
 			nav li, nav a {
 				color: blue;
@@ -47,6 +52,7 @@
 		</header>
 		<article>
 			<nav dir="rtl">
+				<button data-alt-text="Menu">Close</button>
 				<ul>
 					<li><a href="#section1">section 1</a></li>
 					<li><a href="#section2">section 2</a></li>
