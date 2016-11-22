@@ -69,7 +69,7 @@
 				$('html, body').stop().animate({
 					scrollTop: $(hash).offset().top
 				}, 1000, 'easeOutCubic', function(e) {
-					console.log('animation ended');
+					//console.log('animation ended');
 					pageIsScrollingByScript = false;
 				});
 
@@ -92,7 +92,7 @@
 			var index = result.index;
 
 			if ($section === undefined) {
-				console.log('no section found');
+				//console.log('no section found');
 				return;
 			}
 
