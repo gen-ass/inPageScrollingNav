@@ -32,12 +32,13 @@
 			//populate sections array
 			$navItems.find('a').each(function() {
 				var selector = $(this).attr('href');
-				var $section = $(selector);
 
-				if ($section.length) {
-					sections.push($section);
-				} else {
+				if (selector.charAt(0) === '#') {
+					var $section = $(selector);
 
+					if ($section.length) {
+						sections.push($section);
+					}
 				}
 			});
 
