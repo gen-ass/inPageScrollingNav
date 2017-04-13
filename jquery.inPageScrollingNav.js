@@ -1,7 +1,7 @@
 /*
  * @name          inPageScrollingNav
- * @version       1.0
- * @lastmodified  2016-11-22
+ * @version       1.1.0
+ * @lastmodified  2017-04-13
  * @author        Saeid Mohadjer
  *
  * Licensed under the MIT License
@@ -36,6 +36,8 @@
 
 				if ($section.length) {
 					sections.push($section);
+				} else {
+
 				}
 			});
 
@@ -45,14 +47,26 @@
 			setInterval(function() {
 				if (pluginInstance.scrolled) {
 					pluginInstance.scrolled = false;
-					pluginInstance.setActiveSection(sections, $navItems);
+					pluginInstance.updateNavState(sections, $navItems);
 				}
 			}, 250);
+
+			//if URL has a hash tag corresponding to a section scroll to that
+			//section and update nav state. This is useful when sections dont'
+			//have id on page load and their id is added via js later.
+			var hash = window.location.hash;
+
+			if (hash.length > 0) {
+				pluginInstance.scrollToSection(hash, function() {
+					pluginInstance.updateNavState(sections, $navItems);
+				});
+			}
 		},
 
 		setEventHandlers: function($navItems) {
 			var pluginInstance = this;
-			var pageIsScrollingByScript = false;
+
+			pluginInstance.pageIsScrollingByScript = false;
 
 			//close button
 			(function() {
@@ -78,48 +92,51 @@
 			})();
 
 			$navItems.on('click', function(e) {
-
 				if (!pluginInstance.options.updateAddressBar) {
 					e.preventDefault();
 				}
 
-				var $link = $(this).find('a');
-				var hash = $link.attr('href');
-
-				pageIsScrollingByScript = true;
-
-				$('html, body').stop().animate({
-					scrollTop: $(hash).offset().top
-				}, 1000, 'easeOutCubic', function(e) {
-					//console.log('animation ended');
-					pageIsScrollingByScript = false;
-				});
-
-				$(this).addClass('selected').siblings().removeClass('selected');
+				pluginInstance.scrollToSection($(this).find('a').attr('href'));
+				pluginInstance.updateNav($(this));
 			});
 
 			//we only care for scrolling by user so we ignore scroll events
 			//fired since user clicked on a nav item
 			$(window).on('scroll', function(e) {
-				if (!pageIsScrollingByScript) {
+				if (!pluginInstance.pageIsScrollingByScript) {
 					pluginInstance.scrolled = true;
 				}
 			});
 		},
 
-		setActiveSection: function(sections, $navItems) {
+		scrollToSection: function(selector, callback) {
+			var pluginInstance = this;
+
+			pluginInstance.pageIsScrollingByScript = true;
+
+			$('html, body').stop().animate({
+				scrollTop: $(selector).offset().top
+			}, 1000, 'easeOutCubic', function(e) {
+				//console.log('animation ended');
+				pluginInstance.pageIsScrollingByScript = false;
+
+				if (callback) {
+					callback();
+				}
+			});
+		},
+
+		updateNavState: function(sections, $navItems) {
 			var pluginInstance = this;
 			var result = pluginInstance.getCurrentSection(sections);
-			var $section = result.$section;
-			var index = result.index;
 
-			if ($section === undefined) {
-				//console.log('no section found');
-				return;
+			if (result.$section !== undefined) {
+				var $navItem = $navItems.eq(result.index);
+				pluginInstance.updateNav($navItem);
 			}
+		},
 
-			var $navItem = $navItems.eq(index);
-
+		updateNav: function($navItem) {
 			$navItem.addClass('selected').siblings().removeClass('selected');
 		},
 
@@ -150,8 +167,7 @@
 
 			//if no section is found and we are above first section
 			if (!sectionFound && $firstSection.offset().top > sctop &&
-			$firstSection.offset().top < sctop + windowHeight/2
-		) {
+			$firstSection.offset().top < sctop + windowHeight/2) {
 				$currentSection = $firstSection;
 				index = 0;
 			}
