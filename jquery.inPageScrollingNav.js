@@ -54,13 +54,14 @@
 			//if URL has a hash tag corresponding to a section scroll to that
 			//section and update nav state. This is useful when sections dont'
 			//have id on page load and their id is added via js later.
+			/*
 			var hash = window.location.hash;
-
 			if (hash.length > 0) {
 				pluginInstance.scrollToSection(hash, function() {
 					pluginInstance.updateNavState(sections, $navItems);
 				});
 			}
+			*/
 		},
 
 		setEventHandlers: function($navItems) {
