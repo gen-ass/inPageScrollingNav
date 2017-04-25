@@ -1,7 +1,7 @@
 /*
  * @name          inPageScrollingNav
- * @version       1.1.0
- * @lastmodified  2017-04-13
+ * @version       1.2.0
+ * @lastmodified  2017-04-25
  * @author        Saeid Mohadjer
  *
  * Licensed under the MIT License
@@ -19,6 +19,9 @@
 		this.options = $.extend({}, defaults, options);
 		this._defaults = defaults;
 		this._name = pluginName;
+
+		this.sections = [];
+
 		this.init();
 	}
 
@@ -26,8 +29,35 @@
 	var methods = {
 		init: function() {
 			var pluginInstance = this;
-			var sections = [];
 			var $navItems = pluginInstance.$element.find('li');
+
+			pluginInstance.getSections($navItems);
+			pluginInstance.scrolled = false;
+			pluginInstance.setEventHandlers($navItems);
+
+			setInterval(function() {
+				if (pluginInstance.scrolled) {
+					pluginInstance.scrolled = false;
+					pluginInstance.updateNavState(pluginInstance.sections, $navItems);
+				}
+			}, 250);
+
+			//if URL has a hash tag corresponding to a section scroll to that
+			//section and update nav state. This is useful when sections dont'
+			//have id on page load and their id is added via js later or when we
+			//we have a fixed header on top of viewport masking sections
+
+			var hash = window.location.hash;
+
+			if (hash.length > 0 && $(hash).length > 0) {
+				pluginInstance.scrollToSection(hash, function() {
+					pluginInstance.updateNavState(pluginInstance.sections, $navItems);
+				});
+			}
+		},
+
+		getSections: function($navItems) {
+			var pluginInstance = this;
 
 			//populate sections array
 			$navItems.find('a').each(function() {
@@ -37,32 +67,10 @@
 					var $section = $(selector);
 
 					if ($section.length) {
-						sections.push($section);
+						pluginInstance.sections.push($section);
 					}
 				}
 			});
-
-			pluginInstance.scrolled = false;
-			pluginInstance.setEventHandlers($navItems);
-
-			setInterval(function() {
-				if (pluginInstance.scrolled) {
-					pluginInstance.scrolled = false;
-					pluginInstance.updateNavState(sections, $navItems);
-				}
-			}, 250);
-
-			//if URL has a hash tag corresponding to a section scroll to that
-			//section and update nav state. This is useful when sections dont'
-			//have id on page load and their id is added via js later.
-			/*
-			var hash = window.location.hash;
-			if (hash.length > 0) {
-				pluginInstance.scrollToSection(hash, function() {
-					pluginInstance.updateNavState(sections, $navItems);
-				});
-			}
-			*/
 		},
 
 		setEventHandlers: function($navItems) {
@@ -113,13 +121,21 @@
 
 		scrollToSection: function(selector, callback) {
 			var pluginInstance = this;
+			var offset = 0;
+
+			if (pluginInstance.options.offset) {
+				if (typeof pluginInstance.options.offset === 'function') {
+					offset = pluginInstance.options.offset();
+				} else {
+					offset = pluginInstance.options.offset;
+				}
+			}
 
 			pluginInstance.pageIsScrollingByScript = true;
 
 			$('html, body').stop().animate({
-				scrollTop: $(selector).offset().top
-			}, 1000, 'easeOutCubic', function(e) {
-				//console.log('animation ended');
+				scrollTop: $(selector).offset().top - offset
+			}, 1000, 'easeOutCubic').promise().done(function() {
 				pluginInstance.pageIsScrollingByScript = false;
 
 				if (callback) {
