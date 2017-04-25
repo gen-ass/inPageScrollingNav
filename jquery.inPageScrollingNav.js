@@ -1,6 +1,6 @@
 /*
  * @name          inPageScrollingNav
- * @version       1.2.0
+ * @version       1.3.0
  * @lastmodified  2017-04-25
  * @author        Saeid Mohadjer
  *
@@ -29,16 +29,17 @@
 	var methods = {
 		init: function() {
 			var pluginInstance = this;
-			var $navItems = pluginInstance.$element.find('li');
 
-			pluginInstance.getSections($navItems);
+			pluginInstance.$navItems = pluginInstance.$element.find('li');
+			pluginInstance.getSections(pluginInstance.$navItems);
 			pluginInstance.scrolled = false;
-			pluginInstance.setEventHandlers($navItems);
+			pluginInstance.pageIsScrollingByScript = false;
+			pluginInstance.setEventHandlers(pluginInstance.$navItems);
 
 			setInterval(function() {
 				if (pluginInstance.scrolled) {
 					pluginInstance.scrolled = false;
-					pluginInstance.updateNavState(pluginInstance.sections, $navItems);
+					pluginInstance.updateNavState(pluginInstance.sections, pluginInstance.$navItems);
 				}
 			}, 250);
 
@@ -48,10 +49,17 @@
 			//we have a fixed header on top of viewport masking sections
 
 			var hash = window.location.hash;
+			if (hash.length > 0) {
+				pluginInstance.hashChangeEventHandler(hash);
+			}
+		},
 
-			if (hash.length > 0 && $(hash).length > 0) {
+		hashChangeEventHandler: function(hash) {
+			var pluginInstance = this;
+
+			if ($(hash).length > 0) {
 				pluginInstance.scrollToSection(hash, function() {
-					pluginInstance.updateNavState(pluginInstance.sections, $navItems);
+					pluginInstance.updateNavState(pluginInstance.sections, pluginInstance.$navItems);
 				});
 			}
 		},
@@ -76,36 +84,7 @@
 		setEventHandlers: function($navItems) {
 			var pluginInstance = this;
 
-			pluginInstance.pageIsScrollingByScript = false;
-
-			//close button
-			(function() {
-				var $nav = pluginInstance.$element;
-				var $btn = $nav.find('button');
-
-				if ($btn.length === 0) {
-					return;
-				}
-
-				var text = $btn.text();
-				var altText = $btn.data('alt-text');
-
-				$btn.on('click', function() {
-					$nav.toggleClass('closed');
-
-					if ($btn.text() === text) {
-						$btn.text(altText);
-					} else {
-						$btn.text(text);
-					}
-				});
-			})();
-
 			$navItems.on('click', function(e) {
-				if (!pluginInstance.options.updateAddressBar) {
-					e.preventDefault();
-				}
-
 				pluginInstance.scrollToSection($(this).find('a').attr('href'));
 				pluginInstance.updateNav($(this));
 			});
@@ -115,6 +94,14 @@
 			$(window).on('scroll', function(e) {
 				if (!pluginInstance.pageIsScrollingByScript) {
 					pluginInstance.scrolled = true;
+				}
+			});
+
+			$(window).on('hashchange', function(e) {
+				//user is editing hash in address bar
+				var hash = window.location.hash;
+				if (hash.length > 0) {
+					pluginInstance.hashChangeEventHandler(hash);
 				}
 			});
 		},

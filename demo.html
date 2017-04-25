@@ -29,11 +29,8 @@
 				position: fixed;
 				background: rgba(200, 200, 200, 0.9);
 				right: 0;
-				top: 100px;
+				top: 200px;
 				padding: 0 10px 0 20px;
-			}
-			nav.closed ul {
-				display: none;
 			}
 			nav li, nav a {
 				color: blue;
@@ -50,9 +47,6 @@
 			$(document).ready(function() {
 				//initialize plugin
 				$('nav').inPageScrollingNav({
-					//updateAddressBar by default is false, if set to true, nav link's
-					//hash tag will be added to browser's address bar whenever a nav item is clicked
-					updateAddressBar: true,
 					//offset can be a fixed value or a function that returns a value
 					//offset allows to nav scroll not to a top of viewport and is
 					//usefull in cases when a page has a position fixed header/navbar on top
@@ -69,7 +63,6 @@
 		</header>
 		<article>
 			<nav dir="rtl">
-				<button data-alt-text="Menu">Close</button>
 				<ul>
 					<li><a href="#section1">section 1</a></li>
 					<li><a href="#section2">section 2</a></li>
