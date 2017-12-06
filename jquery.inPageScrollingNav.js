@@ -123,6 +123,7 @@
 			$('html, body').stop().animate({
 				scrollTop: $(selector).offset().top - offset
 			}, 1000, 'easeOutCubic').promise().done(function() {
+				console.log('done');
 				pluginInstance.pageIsScrollingByScript = false;
 
 				if (callback) {
