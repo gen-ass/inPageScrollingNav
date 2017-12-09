@@ -29,7 +29,8 @@
 				position: fixed;
 				background: rgba(200, 200, 200, 0.9);
 				right: 0;
-				top: 200px;
+				top: 50vh;
+				transform: translateY(-50%);
 				padding: 0 10px 0 20px;
 				min-width: 250px;
 			}
@@ -50,7 +51,9 @@
 		<script>
 			$(document).ready(function() {
 				//initialize plugin
-				$('nav').inPageScrollingNav({
+				$('nav ul').inPageScrollingNav({
+					updateURLHash: false, //default is true
+					easing: 'easeOutCubic',
 					//offset can be a fixed value or a function that returns a value
 					//offset allows to nav scroll not to a top of viewport and is
 					//usefull in cases when a page has a position fixed header/navbar on top
@@ -76,7 +79,7 @@
 			</nav>
 			<section id="section1">
 				<h2>Section 1</h2>
-				<p>öäüß Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 				<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 			</section>
 			<div id="section2">

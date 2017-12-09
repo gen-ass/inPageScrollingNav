@@ -1,7 +1,7 @@
 /*
  * @name          inPageScrollingNav
- * @version       1.3.0
- * @lastmodified  2017-04-25
+ * @version       1.4.0
+ * @lastmodified  09.12.2017
  * @author        Saeid Mohadjer
  *
  * Licensed under the MIT License
@@ -19,27 +19,25 @@
 		this.options = $.extend({}, defaults, options);
 		this._defaults = defaults;
 		this._name = pluginName;
-
-		this.sections = [];
-
 		this.init();
 	}
 
 	// methods
 	var methods = {
 		init: function() {
-			var pluginInstance = this;
+			var self = this;
+			var $navItems = self.$element.children();
 
-			pluginInstance.$navItems = pluginInstance.$element.find('li');
-			pluginInstance.getSections(pluginInstance.$navItems);
-			pluginInstance.scrolled = false;
-			pluginInstance.pageIsScrollingByScript = false;
-			pluginInstance.setEventHandlers(pluginInstance.$navItems);
+			self.scrolled = false;
+			self.pageIsScrollingByScript = false;
+			self.sections = self.getSections($navItems);
+			self.setEventHandlers($navItems);
 
 			setInterval(function() {
-				if (pluginInstance.scrolled) {
-					pluginInstance.scrolled = false;
-					pluginInstance.updateNavState(pluginInstance.sections, pluginInstance.$navItems);
+				if (self.scrolled) {
+					//console.log('scrolled');
+					self.scrolled = false;
+					self.updateNavState(self.sections, $navItems);
 				}
 			}, 250);
 
@@ -47,85 +45,78 @@
 			//section and update nav state. This is useful when sections dont'
 			//have id on page load and their id is added via js later or when we
 			//we have a fixed header on top of viewport masking sections
-
 			var hash = window.location.hash;
-			if (hash.length > 0) {
-				pluginInstance.hashChangeEventHandler(hash);
-			}
-		},
+			var callback = function() {
+				self.updateNavState(self.sections, $navItems);
+			};
 
-		hashChangeEventHandler: function(hash) {
-			var pluginInstance = this;
-
-			if ($(hash).length > 0) {
-				pluginInstance.scrollToSection(hash, function() {
-					pluginInstance.updateNavState(pluginInstance.sections, pluginInstance.$navItems);
-				});
+			if (hash.length > 0 && $(hash).length > 0) {
+				// use setTimeout so scrollToSection runs after browser's native jumping to hash tag of URL
+				setTimeout(function() {
+					self.scrollToSection(hash, callback);
+				}, 0);
 			}
 		},
 
 		getSections: function($navItems) {
-			var pluginInstance = this;
+			var self = this;
+			var arr = [];
 
-			//populate sections array
 			$navItems.find('a').each(function() {
 				var selector = $(this).attr('href');
+				var $section = $(selector);
 
-				if (selector.charAt(0) === '#') {
-					var $section = $(selector);
-
-					if ($section.length) {
-						pluginInstance.sections.push($section);
-					}
+				if ($section.length) {
+					arr.push($section);
 				}
 			});
+
+			return arr;
 		},
 
 		setEventHandlers: function($navItems) {
-			var pluginInstance = this;
+			var self = this;
 
 			$navItems.on('click', function(e) {
-				pluginInstance.scrollToSection($(this).find('a').attr('href'));
-				pluginInstance.updateNav($(this));
+				if (!self.options.updateURLHash) {
+					e.preventDefault();
+				}
+
+				var sectionId = $(this).find('a').attr('href').split('#')[1];
+				var $section = $('#' + sectionId);
+
+				self.scrollToSection($(this).find('a').attr('href'));
+				self.updateNav($(this));
 			});
 
 			//we only care for scrolling by user so we ignore scroll events
 			//fired since user clicked on a nav item
 			$(window).on('scroll', function(e) {
-				if (!pluginInstance.pageIsScrollingByScript) {
-					pluginInstance.scrolled = true;
-				}
-			});
-
-			$(window).on('hashchange', function(e) {
-				//user is editing hash in address bar
-				var hash = window.location.hash;
-				if (hash.length > 0) {
-					pluginInstance.hashChangeEventHandler(hash);
+				if (!self.pageIsScrollingByScript) {
+					self.scrolled = true;
 				}
 			});
 		},
 
 		scrollToSection: function(selector, callback) {
-			var pluginInstance = this;
+			var self = this;
 			var offset = 0;
+			var easing = self.options.easing || 'linear';
 
-			if (pluginInstance.options.offset) {
-				if (typeof pluginInstance.options.offset === 'function') {
-					offset = pluginInstance.options.offset();
+			if (self.options.offset) {
+				if (typeof self.options.offset === 'function') {
+					offset = self.options.offset();
 				} else {
-					offset = pluginInstance.options.offset;
+					offset = self.options.offset;
 				}
 			}
 
-			pluginInstance.pageIsScrollingByScript = true;
+			self.pageIsScrollingByScript = true;
 
 			$('html, body').stop().animate({
 				scrollTop: $(selector).offset().top - offset
-			}, 1000, 'easeOutCubic').promise().done(function() {
-				console.log('done');
-				pluginInstance.pageIsScrollingByScript = false;
-
+			}, 1000, easing).promise().done(function() {
+				self.pageIsScrollingByScript = false;
 				if (callback) {
 					callback();
 				}
@@ -133,12 +124,12 @@
 		},
 
 		updateNavState: function(sections, $navItems) {
-			var pluginInstance = this;
-			var result = pluginInstance.getCurrentSection(sections);
+			var self = this;
+			var result = self.getCurrentSection(sections);
 
 			if (result.$section !== undefined) {
 				var $navItem = $navItems.eq(result.index);
-				pluginInstance.updateNav($navItem);
+				self.updateNav($navItem);
 			}
 		},
 
@@ -147,7 +138,7 @@
 		},
 
 		getCurrentSection: function(sections) {
-			var pluginInstance = this;
+			var self = this;
 			var sctop = $(window).scrollTop();
 			var $currentSection;
 			var sectionFound = false;
