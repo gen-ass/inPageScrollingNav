@@ -11,7 +11,9 @@
 	'use strict';
 
 	var pluginName = 'inPageScrollingNav',
-	defaults = {};
+	defaults = {
+		updateURLHash: true
+	};
 
 	// The actual plugin constructor
 	function Plugin(element, options) {

@@ -52,8 +52,12 @@
 			$(document).ready(function() {
 				//initialize plugin
 				$('nav ul').inPageScrollingNav({
-					updateURLHash: false, //default is true
+					/* set updateURLHash to false if you don't want to change hash in URL. By default updateURLHash is true. */
+					//updateURLHash: false
+
+					// by default plugin uses "linear" easing. If you have included jquery.easing.js in your project, you can use other easing types via "easing" option.
 					easing: 'easeOutCubic',
+					
 					//offset can be a fixed value or a function that returns a value
 					//offset allows to nav scroll not to a top of viewport and is
 					//usefull in cases when a page has a position fixed header/navbar on top
